@@ -5,7 +5,7 @@
       <p class="card-text">
         {{nome}}
       </p>
-      <b-button href="#" variant="primary">Ver detalhes</b-button>
+      <b-button :to="'/deputado/' + numero" variant="primary">Ver detalhes</b-button>
     </b-card>
   </b-col>
 </template>
