@@ -2,15 +2,8 @@
   <b-container fluid>
     <b-row v-if="deputados.length!=0">
       <b-col cols="12">
-        <b-form-group id="nome"
-                      label="Nome do deputado"
-                      label-for="inputNome"
-                      description="Pesquie o deputado pelo nome">
-          <b-form-input id="inputNome"
-                        type="text"
-                        v-model="filtroDeputados"
-                        placeholder="Tiririca">
-          </b-form-input>
+        <b-form-group id="nome" label="Nome do deputado" label-for="inputNome" description="Pesquie o deputado pelo nome">
+          <b-form-input id="inputNome" type="text" v-model="filtroDeputados" placeholder="Tiririca"> </b-form-input>
         </b-form-group>
       </b-col>
       <card-dep v-for="deputado in deputadosFiltrados" :nome="deputado.nome" :foto="deputado.urlFoto" :numero="String(deputado.id)"></card-dep>

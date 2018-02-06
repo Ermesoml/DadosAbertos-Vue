@@ -10,7 +10,9 @@
         UF de nascimento: {{deputado.ufNascimento}} <br>
         Escolaridade: {{deputado.escolaridade}} <br>
         Email: {{deputado.ultimoStatus.gabinete.email}} <br>
-        Condição eleitoral: {{deputado.ultimoStatus.condicaoEleitoral}} <br> 
+        Condição eleitoral: {{deputado.ultimoStatus.condicaoEleitoral}} <br>
+        Total gasto em {{ano_pesquisa}}: <strong>R${{totalGastoAno}}</strong> <br>
+        Total gasto filtrado: <strong>R${{totalGastoFiltrado}}</strong> <br>
       </p>
     </div>
     <b-row>
@@ -18,7 +20,10 @@
          <b-form-select v-model="ano_pesquisa" :options="options" class="mb-3" @input="buscarDespesas" />
       </b-col>
       <b-col cols="12">
-        <b-table :per-page="itensPorPagina" :current-page="paginaAtual" responsive bordered striped hover :fields="fields" :items="despesas"></b-table>
+         <b-form-input v-model="filtro" type="text" placeholder="Pesquise nas despesas..." class="mb-3"></b-form-input>
+      </b-col>
+      <b-col cols="12">
+        <b-table @filtered="onFiltered" :filter="filtro" :per-page="itensPorPagina" :current-page="paginaAtual" responsive bordered striped hover :fields="fields" :items="despesas"></b-table>
       </b-col>
       <b-col cols="12">
         <b-pagination align="center" :total-rows="linhasTotais" :per-page="itensPorPagina" v-model="paginaAtual" class="my-0" />
@@ -37,6 +42,7 @@
         api: 'https://dadosabertos.camara.leg.br/api/v2/deputados/',
         deputado: {},
         despesas: [],
+        despesas_filtradas: [],
         ano_pesquisa: 0,
         fields: {
           ano: {
@@ -72,7 +78,24 @@
         ],
         paginaAtual: 1,
         itensPorPagina: 20,
-        linhasTotais: 0
+        linhasTotais: 0,
+        filtro: ''
+      }
+    },
+    computed: {
+      totalGastoFiltrado: function () {
+        let total = 0
+        for (let i = 0; i < this.despesas_filtradas.length; i++) {
+          total += parseFloat(this.despesas_filtradas[i].valorLiquido)
+        }
+        return this.formatarValor(total)
+      },
+      totalGastoAno: function () {
+        let total = 0
+        for (let i = 0; i < this.despesas.length; i++) {
+          total += parseFloat(this.despesas[i].valorLiquido)
+        }
+        return this.formatarValor(total)
       }
     },
     mounted: function () {
@@ -89,8 +112,10 @@
       },
       buscarDespesas: function () {
         this.despesas = []
+        this.despesas_filtradas = []
         this.$http.get('https://dadosabertos.camara.leg.br/api/v2/deputados/' + this.$route.params.id + '/despesas' + '?ano=' + this.ano_pesquisa + '&itens=100&ordem=desc&ordenarPor=numMes').then((response) => {
           this.despesas = response.data.dados
+          this.despesas_filtradas = response.data.dados
           this.linhasTotais = this.despesas.length
           for (let i = 0; i < response.data.links.length; i++) {
             if (response.data.links[i].rel === 'next') {
@@ -102,6 +127,7 @@
       buscarDespesasURL: function (url) {
         this.$http.get(url).then((response) => {
           this.despesas = this.despesas.concat(response.data.dados)
+          this.despesas_filtradas = this.despesas_filtradas.concat(response.data.dados)
           this.linhasTotais = this.despesas.length
           for (let i = 0; i < response.data.links.length; i++) {
             if (response.data.links[i].rel === 'next') {
@@ -109,6 +135,12 @@
             }
           }
         })
+      },
+      onFiltered: function (filteredItems) {
+        // Trigger pagination to update the number of buttons/pages due to filtering
+        this.linhasTotais = filteredItems.length
+        this.paginaAtual = 1
+        this.despesas_filtradas = filteredItems
       },
       formatarValor: function (valor, quant_casas_decimais = 2) {
         var formatter = new Intl.NumberFormat('pt-BR', {
