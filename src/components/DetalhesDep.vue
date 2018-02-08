@@ -16,7 +16,7 @@
       </p>
     </div>
     <b-row>
-      <line-chart :data="dados_grafico"></line-chart>
+      <line-chart :data="dadosGraficos"></line-chart>
     </b-row>
     <b-row>
       <b-col cols="12">
@@ -62,7 +62,7 @@
           },
           valorLiquido: {
             key: 'valorLiquido',
-            label: 'Tipo de líquido'
+            label: 'Total líquido'
           },
           dataDocumento: {
             key: 'dataDocumento',
@@ -82,8 +82,7 @@
         paginaAtual: 1,
         itensPorPagina: 20,
         linhasTotais: 0,
-        filtro: '',
-        dados_grafico: []
+        filtro: ''
       }
     },
     computed: {
@@ -100,6 +99,45 @@
           total += parseFloat(this.despesas[i].valorLiquido)
         }
         return this.formatarValor(total)
+      },
+      dadosGraficos: function () {
+        var dadosGrafico = []
+        var dado = {}
+        var mes = 0
+        var valorTotal = 0
+        dado.data = []
+        dado.name = 'Despesas'
+        for (let i = 0; i < this.despesas_filtradas.length; i++) {
+          if (parseInt(this.despesas_filtradas[i].mes) > mes || this.despesas_filtradas.length === (i + 1)) {
+            if (mes === 0) {
+              valorTotal += parseFloat(this.despesas_filtradas[i].valorLiquido)
+              mes = this.despesas_filtradas[i].mes
+            } else if (this.despesas_filtradas.length === (i + 1)) {
+              valorTotal += parseFloat(this.despesas_filtradas[i].valorLiquido)
+
+              let values = []
+              values.push(this.getMesAnalitico(mes))
+              values.push(valorTotal)
+
+              dado.data.push(values)
+              mes = this.despesas_filtradas[i].mes
+              valorTotal = 0
+            } else {
+              let values = []
+              values.push(this.getMesAnalitico(mes))
+              values.push(valorTotal)
+
+              dado.data.push(values)
+              mes = this.despesas_filtradas[i].mes
+              valorTotal = 0
+              valorTotal += parseFloat(this.despesas_filtradas[i].valorLiquido)
+            }
+          } else {
+            valorTotal += parseFloat(this.despesas_filtradas[i].valorLiquido)
+          }
+        }
+        dadosGrafico.push(dado)
+        return dadosGrafico
       }
     },
     mounted: function () {
@@ -129,7 +167,7 @@
         })
       },
       buscarDespesasURL: function (url) {
-        this.$http.get(url).then((response) => {
+        this.$http.get(url + '&ordenarPor=numMes').then((response) => {
           this.despesas = this.despesas.concat(response.data.dados)
           this.despesas_filtradas = this.despesas_filtradas.concat(response.data.dados)
           this.linhasTotais = this.despesas.length
@@ -152,6 +190,36 @@
           maximumFractionDigits: 2
         })
         return formatter.format(valor)
+      },
+      getMesAnalitico: function (mes) {
+        switch (mes) {
+          case '1':
+            return 'Janeiro'
+          case '2':
+            return 'Fevereiro'
+          case '3':
+            return 'Março'
+          case '4':
+            return 'Abril'
+          case '5':
+            return 'Maio'
+          case '6':
+            return 'Junho'
+          case '7':
+            return 'Julho'
+          case '8':
+            return 'Agosto'
+          case '9':
+            return 'Setembro'
+          case '10':
+            return 'Outubro'
+          case '11':
+            return 'Novembro'
+          case '12':
+            return 'Dezembro'
+          default:
+            return 'Não definido'
+        }
       }
     },
     components: {
