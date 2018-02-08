@@ -6,9 +6,12 @@ import router from './router'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import BootstrapVue from 'bootstrap-vue'
+import Chartkick from 'chartkick'
+import VueChartkick from 'vue-chartkick'
 
 Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
+Vue.use(VueChartkick, { Chartkick })
 
 Vue.config.productionTip = false
 

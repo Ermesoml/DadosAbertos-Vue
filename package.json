@@ -16,8 +16,10 @@
   "dependencies": {
     "axios": "^0.17.1",
     "bootstrap-vue": "^2.0.0-rc.1",
+    "chartkick": "^2.2.4",
     "vue": "^2.5.2",
     "vue-axios": "^2.0.2",
+    "vue-chartkick": "^0.2.0",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

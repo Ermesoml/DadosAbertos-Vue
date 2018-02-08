@@ -16,6 +16,9 @@
       </p>
     </div>
     <b-row>
+      <line-chart :data="dados_grafico"></line-chart>
+    </b-row>
+    <b-row>
       <b-col cols="12">
          <b-form-select v-model="ano_pesquisa" :options="options" class="mb-3" @input="buscarDespesas" />
       </b-col>
@@ -79,7 +82,8 @@
         paginaAtual: 1,
         itensPorPagina: 20,
         linhasTotais: 0,
-        filtro: ''
+        filtro: '',
+        dados_grafico: []
       }
     },
     computed: {
