@@ -36,6 +36,6 @@ Uma instância do sistema construido inicialmente na pasta /dist foi movida para
 npm install
 # Inicie o servidor em modo de desenvolvimento com hot reload em localhost:8080
 npm run dev
-# Build para produção, com minificação. Cria uma pasta /dev com o site.
+# Build para produção, com minificação. Cria uma pasta /dist com o site.
 npm run build
 ```
