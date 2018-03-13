@@ -28,6 +28,8 @@
         for (var file of chunk.files) {
           if (file.match(/\.(js|css)$/)) { %>
     <link rel="<%= chunk.initial?'preload':'prefetch' %>" href="<%= htmlWebpackPlugin.files.publicPath + file %>" as="<%= file.match(/\.css$/)?'style':'script' %>"><% }}} %>
+    
+    <script src="https://unpkg.com/chart.js@2.7.1/dist/Chart.bundle.js"></script>
   </head>
   <body>
     <noscript>
