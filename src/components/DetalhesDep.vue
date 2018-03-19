@@ -2,7 +2,7 @@
   <b-container fluid>
     <div class="detalhes-dep" v-if="deputado.ultimoStatus!=undefined">
       <!-- <h1>{{$route.params.id}}</h1> -->
-      <b-img :src="deputado.ultimoStatus.urlFoto"></b-img>
+      <b-img rounded="circle" :src="deputado.ultimoStatus.urlFoto"></b-img>
       <h1>{{deputado.nomeCivil}}</h1>
       <p>
         Partido: {{deputado.ultimoStatus.siglaPartido}}<br>
@@ -15,23 +15,36 @@
         Total gasto filtrado: <strong>R${{totalGastoFiltrado}}</strong> <br>
       </p>
     </div>
-    <b-row>
-      <line-chart :data="dadosGraficos"></line-chart>
-    </b-row>
-    <b-row>
-      <b-col cols="12">
-         <b-form-select v-model="ano_pesquisa" :options="options" class="mb-3" @input="buscarDespesas" />
-      </b-col>
-      <b-col cols="12">
-         <b-form-input v-model="filtro" type="text" placeholder="Pesquise nas despesas..." class="mb-3"></b-form-input>
-      </b-col>
-      <b-col cols="12">
-        <b-table @filtered="onFiltered" :filter="filtro" :per-page="itensPorPagina" :current-page="paginaAtual" responsive bordered striped hover :fields="fields" :items="despesas"></b-table>
-      </b-col>
-      <b-col cols="12">
-        <b-pagination align="center" :total-rows="linhasTotais" :per-page="itensPorPagina" v-model="paginaAtual" class="my-0" />
-      </b-col>
-    </b-row>
+    <b-card no-body>
+      <b-tabs card>
+        <b-tab title="Despesas" active>
+          <b-row>
+            <line-chart :data="dadosGraficos"></line-chart>
+          </b-row>
+          <b-row class="mb-3">
+            <b-col cols="12">
+               <b-form-select v-model="ano_pesquisa" :options="options" class="mb-3" @input="buscarDespesas" />
+            </b-col>
+            <b-col cols="12">
+               <b-form-input v-model="filtro" type="text" placeholder="Pesquise nas despesas..." class="mb-3"></b-form-input>
+            </b-col>
+            <b-col cols="12">
+              <b-table @filtered="onFiltered" :filter="filtro" :per-page="itensPorPagina" :current-page="paginaAtual" responsive bordered striped hover :fields="fields" :items="despesas"></b-table>
+            </b-col>
+            <b-col cols="12">
+              <b-pagination align="center" :total-rows="linhasTotais" :per-page="itensPorPagina" v-model="paginaAtual" class="my-0" />
+            </b-col>
+          </b-row>
+        </b-tab>
+        <b-tab title="Proposições (propostas de leis)" >
+          <b-row>
+            <b-col cols="12">
+              <b-table :per-page="itensPorPagina" :current-page="paginaAtualProposicoes" responsive bordered striped hover :fields="fieldsProposicoes" :items="proposicoes"></b-table>
+            </b-col>
+          </b-row>
+        </b-tab>
+      </b-tabs>
+    </b-card>
   </b-container>
 </template>
 
@@ -73,6 +86,20 @@
             label: 'Fornecedor'
           }
         },
+        fieldsProposicoes: {
+          id: {
+            key: 'id',
+            label: 'ID'
+          },
+          ano: {
+            key: 'ano',
+            label: 'Ano'
+          },
+          ementa: {
+            key: 'ementa',
+            label: 'Ementa'
+          }
+        },
         options: [
           { value: 2018, text: '2018' },
           { value: 2017, text: '2017' },
@@ -82,7 +109,11 @@
         paginaAtual: 1,
         itensPorPagina: 20,
         linhasTotais: 0,
-        filtro: ''
+        filtro: '',
+
+        proposicoes: [],
+        linhasTotaisProposicoes: 0,
+        paginaAtualProposicoes: 1
       }
     },
     computed: {
@@ -145,6 +176,7 @@
       this.ano_pesquisa = d.getFullYear()
       this.buscarDeputado()
       this.buscarDespesas()
+      this.buscarProposicoes()
     },
     methods: {
       buscarDeputado: function () {
@@ -174,6 +206,29 @@
           for (let i = 0; i < response.data.links.length; i++) {
             if (response.data.links[i].rel === 'next') {
               this.buscarDespesasURL(response.data.links[i].href)
+            }
+          }
+        })
+      },
+      buscarProposicoes: function () {
+        this.proposicoes = []
+        this.$http.get('https://dadosabertos.camara.leg.br/api/v2/proposicoes?idAutor=' + this.$route.params.id).then((response) => {
+          this.proposicoes = response.data.dados
+          this.linhasTotaisProposicoes = this.proposicoes.length
+          for (let i = 0; i < response.data.links.length; i++) {
+            if (response.data.links[i].rel === 'next') {
+              this.buscarProposicoesURL(response.data.links[i].href)
+            }
+          }
+        })
+      },
+      buscarProposicoesURL: function (url) {
+        this.$http.get(url).then((response) => {
+          this.proposicoes = this.proposicoes.concat(response.data.dados)
+          this.linhasTotaisProposicoes = this.proposicoes.length
+          for (let i = 0; i < response.data.links.length; i++) {
+            if (response.data.links[i].rel === 'next') {
+              this.buscarProposicoesURL(response.data.links[i].href)
             }
           }
         })

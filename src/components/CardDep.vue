@@ -1,7 +1,8 @@
 <template>
   <b-col md="2" sm="12">
     <b-card tag="article" class="mb-2">
-      <b-card-img :src="foto" alt="Image" :top=true></b-card-img>
+      <b-img rounded="circle" :top="true" :src="foto" style="max-width: 120px" alt="img" class="m-1" />
+      
       <p class="card-text">
         {{nome}}
       </p>
