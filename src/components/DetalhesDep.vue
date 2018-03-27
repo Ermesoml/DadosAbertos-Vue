@@ -39,7 +39,15 @@
         <b-tab title="Proposições (propostas de leis)" >
           <b-row>
             <b-col cols="12">
-              <b-table :per-page="itensPorPagina" :current-page="paginaAtualProposicoes" responsive bordered striped hover :fields="fieldsProposicoes" :items="proposicoes"></b-table>
+              <b-table @click="alert('ok')" :per-page="itensPorPagina" :current-page="paginaAtualProposicoes" responsive bordered striped hover :fields="fieldsProposicoes" :items="proposicoes">
+                <template slot="show_details" slot-scope="row">
+                  <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
+                  <b-button size="sm" @click.stop="alert('ok')" class="mr-2">
+                    Detalhes
+                  </b-button>
+                </template>
+
+              </b-table>
             </b-col>
           </b-row>
         </b-tab>
@@ -97,6 +105,9 @@
           },
           ementa: {
             key: 'ementa',
+            label: 'Ementa'
+          },
+          show_details: {
             label: 'Ementa'
           }
         },
