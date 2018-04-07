@@ -1,8 +1,6 @@
 <template>
   <div id="app">
-    <header>
-      <span>Dados abertos</span>
-    </header>
+    <nav-bar></nav-bar>
     <main>
       <router-view></router-view>
     </main>
@@ -10,8 +8,13 @@
 </template>
 
 <script>
+import NavBar from './components/Layout/NavBar.vue'
+
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    NavBar
+  }
 }
 </script>
 

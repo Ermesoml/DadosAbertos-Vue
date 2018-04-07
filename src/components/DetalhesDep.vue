@@ -40,11 +40,9 @@
           <b-row>
             <b-col cols="12">
               <b-table @click="alert('ok')" :per-page="itensPorPagina" :current-page="paginaAtualProposicoes" responsive bordered striped hover :fields="fieldsProposicoes" :items="proposicoes">
-                <template slot="show_details" slot-scope="row">
+                <template slot="show_details" slot-scope="data">
                   <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
-                  <b-button size="sm" @click.stop="alert('ok')" class="mr-2">
-                    Detalhes
-                  </b-button>
+                  <b-button :to="'/proposicao/' + data.item.id" variant="primary">Ver detalhes</b-button>
                 </template>
 
               </b-table>
