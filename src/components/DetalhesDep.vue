@@ -196,7 +196,7 @@
       buscarDespesas: function () {
         this.despesas = []
         this.despesas_filtradas = []
-        this.$http.get('https://dadosabertos.camara.leg.br/api/v2/deputados/' + this.$route.params.id + '/despesas' + '?ano=' + this.ano_pesquisa + '&itens=100&ordem=desc&ordenarPor=numMes').then((response) => {
+        this.$http.get('https://dadosabertos.camara.leg.br/api/v2/deputados/' + this.$route.params.id + '/despesas' + '?ano=' + this.ano_pesquisa + '&itens=100&ordem=desc&ordenarPor=mes').then((response) => {
           this.despesas = response.data.dados
           this.despesas_filtradas = response.data.dados
           this.linhasTotais = this.despesas.length
@@ -208,7 +208,7 @@
         })
       },
       buscarDespesasURL: function (url) {
-        this.$http.get(url + '&ordenarPor=numMes').then((response) => {
+        this.$http.get(url).then((response) => {
           this.despesas = this.despesas.concat(response.data.dados)
           this.despesas_filtradas = this.despesas_filtradas.concat(response.data.dados)
           this.linhasTotais = this.despesas.length
@@ -257,29 +257,29 @@
       },
       getMesAnalitico: function (mes) {
         switch (mes) {
-          case '1':
+          case 1:
             return 'Janeiro'
-          case '2':
+          case 2:
             return 'Fevereiro'
-          case '3':
+          case 3:
             return 'Março'
-          case '4':
+          case 4:
             return 'Abril'
-          case '5':
+          case 5:
             return 'Maio'
-          case '6':
+          case 6:
             return 'Junho'
-          case '7':
+          case 7:
             return 'Julho'
-          case '8':
+          case 8:
             return 'Agosto'
-          case '9':
+          case 9:
             return 'Setembro'
-          case '10':
+          case 10:
             return 'Outubro'
-          case '11':
+          case 11:
             return 'Novembro'
-          case '12':
+          case 12:
             return 'Dezembro'
           default:
             return 'Não definido'

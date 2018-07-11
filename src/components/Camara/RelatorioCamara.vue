@@ -71,7 +71,7 @@
         }
       },
       buscarDespesas: function (deputadoId) {
-        this.$http.get('https://dadosabertos.camara.leg.br/api/v2/deputados/' + deputadoId + '/despesas' + '?ano=' + this.ano_pesquisa + '&itens=100&ordem=desc&ordenarPor=numMes').then((response) => {
+        this.$http.get('https://dadosabertos.camara.leg.br/api/v2/deputados/' + deputadoId + '/despesas' + '?ano=' + this.ano_pesquisa + '&itens=100&ordem=desc&ordenarPor=mes').then((response) => {
           this.despesas = this.despesas.concat(response.data.dados)
           for (let i = 0; i < response.data.links.length; i++) {
             if (response.data.links[i].rel === 'next') {
@@ -83,7 +83,7 @@
         })
       },
       buscarDespesasURL: function (url) {
-        this.$http.get(url + '&ordenarPor=numMes').then((response) => {
+        this.$http.get(url + '&ordenarPor=mes').then((response) => {
           this.despesas = this.despesas.concat(response.data.dados)
           for (let i = 0; i < response.data.links.length; i++) {
             if (response.data.links[i].rel === 'next') {
