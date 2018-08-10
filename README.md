@@ -20,6 +20,10 @@ As tecnologias utilizadas atualmente são:
 - [vue-chartkick](https://www.chartkick.com/vue)
 - [vue-axios](https://www.npmjs.com/package/vue-axios)
 
+## TODO
+
+- Integrar com o JARBAS API do projeto Serenata de Amor. [link](https://github.com/okfn-brasil/serenata-de-amor/blob/master/jarbas/README.md#json-api-endpoints)
+
 ## Demonstração
 
 Uma instância do sistema construido inicialmente na pasta /dist foi movida para pasta [/docs](https://github.com/Ermesoml/DadosAbertos-Vue/tree/master/docs) neste repositório, podendo ser acessado através [deste link](https://ermesoml.github.io/DadosAbertos-Vue/).

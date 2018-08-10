@@ -29,7 +29,12 @@
                <b-form-input v-model="filtro" type="text" placeholder="Pesquise nas despesas..." class="mb-3"></b-form-input>
             </b-col>
             <b-col cols="12">
-              <b-table @filtered="onFiltered" :filter="filtro" :per-page="itensPorPagina" :current-page="paginaAtual" responsive bordered striped hover :fields="fields" :items="despesas"></b-table>
+              <b-table @filtered="onFiltered" :filter="filtro" :per-page="itensPorPagina" :current-page="paginaAtual" responsive bordered striped hover :fields="fields" :items="despesas">
+                <template slot="mes" slot-scope="data">
+                  ({{data.item.mes}}) {{getMesAnalitico(data.item.mes)}}                  
+                </template> 
+
+              </b-table>
             </b-col>
             <b-col cols="12">
               <b-pagination align="center" :total-rows="linhasTotais" :per-page="itensPorPagina" v-model="paginaAtual" class="my-0" />
@@ -40,11 +45,10 @@
           <b-row>
             <b-col cols="12">
               <b-table @click="alert('ok')" :per-page="itensPorPagina" :current-page="paginaAtualProposicoes" responsive bordered striped hover :fields="fieldsProposicoes" :items="proposicoes">
-                <template slot="show_details" slot-scope="data">
+                <template slot="mostrarDetalhes" slot-scope="data">
                   <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
                   <b-button :to="'/proposicao/' + data.item.id" variant="primary">Ver detalhes</b-button>
                 </template>
-
               </b-table>
             </b-col>
           </b-row>
@@ -56,9 +60,11 @@
 
 <script>
   import CardDep from './CardDep.vue'
+  import funcoesPadroes from './mixins/funcoesPadroes'
 
   export default {
     name: 'detalhes-dep',
+    mixins: [funcoesPadroes],
     data () {
       return {
         api: 'https://dadosabertos.camara.leg.br/api/v2/deputados/',
@@ -105,7 +111,7 @@
             key: 'ementa',
             label: 'Ementa'
           },
-          show_details: {
+          mostrarDetalhes: {
             label: 'Ementa'
           }
         },
@@ -148,7 +154,7 @@
         dado.data = []
         dado.name = 'Despesas'
         for (let i = 0; i < this.despesas_filtradas.length; i++) {
-          if (parseInt(this.despesas_filtradas[i].mes) > mes || this.despesas_filtradas.length === (i + 1)) {
+          if (this.despesas_filtradas[i].mes > mes || this.despesas_filtradas.length === (i + 1) || (this.despesas_filtradas[i].mes < mes && mes > 0)) {
             if (mes === 0) {
               valorTotal += parseFloat(this.despesas_filtradas[i].valorLiquido)
               mes = this.despesas_filtradas[i].mes
@@ -159,7 +165,7 @@
               values.push(this.getMesAnalitico(mes))
               values.push(valorTotal)
 
-              dado.data.push(values)
+              dado.data.unshift(values)
               mes = this.despesas_filtradas[i].mes
               valorTotal = 0
             } else {
@@ -167,7 +173,7 @@
               values.push(this.getMesAnalitico(mes))
               values.push(valorTotal)
 
-              dado.data.push(values)
+              dado.data.unshift(values)
               mes = this.despesas_filtradas[i].mes
               valorTotal = 0
               valorTotal += parseFloat(this.despesas_filtradas[i].valorLiquido)
@@ -177,6 +183,7 @@
           }
         }
         dadosGrafico.push(dado)
+
         return dadosGrafico
       }
     },
@@ -196,7 +203,7 @@
       buscarDespesas: function () {
         this.despesas = []
         this.despesas_filtradas = []
-        this.$http.get('https://dadosabertos.camara.leg.br/api/v2/deputados/' + this.$route.params.id + '/despesas' + '?ano=' + this.ano_pesquisa + '&itens=100&ordem=desc&ordenarPor=numMes').then((response) => {
+        this.$http.get('https://dadosabertos.camara.leg.br/api/v2/deputados/' + this.$route.params.id + '/despesas' + '?ano=' + this.ano_pesquisa + '&itens=100&ordem=desc&ordenarPor=mes').then((response) => {
           this.despesas = response.data.dados
           this.despesas_filtradas = response.data.dados
           this.linhasTotais = this.despesas.length
@@ -208,7 +215,7 @@
         })
       },
       buscarDespesasURL: function (url) {
-        this.$http.get(url + '&ordenarPor=numMes').then((response) => {
+        this.$http.get(url).then((response) => {
           this.despesas = this.despesas.concat(response.data.dados)
           this.despesas_filtradas = this.despesas_filtradas.concat(response.data.dados)
           this.linhasTotais = this.despesas.length
@@ -247,43 +254,6 @@
         this.linhasTotais = filteredItems.length
         this.paginaAtual = 1
         this.despesas_filtradas = filteredItems
-      },
-      formatarValor: function (valor, quant_casas_decimais = 2) {
-        var formatter = new Intl.NumberFormat('pt-BR', {
-          minimumFractionDigits: quant_casas_decimais,
-          maximumFractionDigits: 2
-        })
-        return formatter.format(valor)
-      },
-      getMesAnalitico: function (mes) {
-        switch (mes) {
-          case '1':
-            return 'Janeiro'
-          case '2':
-            return 'Fevereiro'
-          case '3':
-            return 'Março'
-          case '4':
-            return 'Abril'
-          case '5':
-            return 'Maio'
-          case '6':
-            return 'Junho'
-          case '7':
-            return 'Julho'
-          case '8':
-            return 'Agosto'
-          case '9':
-            return 'Setembro'
-          case '10':
-            return 'Outubro'
-          case '11':
-            return 'Novembro'
-          case '12':
-            return 'Dezembro'
-          default:
-            return 'Não definido'
-        }
       }
     },
     components: {

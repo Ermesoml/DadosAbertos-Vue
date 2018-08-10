@@ -1,9 +1,9 @@
 <template>
   <b-container fluid>
     <div class="detalhes-dep" v-if="proposicao.id!=undefined">
-      <h1>{{proposicao.ementa}}</h1>
-      <p>
-      </p>
+      <h2>{{proposicao.id}}</h2>
+      <p>{{proposicao.ementa}}</p>
+      <p><a target="_blank" v-if="proposicao.statusProposicao!=undefined" :href="proposicao.statusProposicao.url">Documento da proposição na íntegra</a></p>
     </div>
   </b-container>
 </template>
