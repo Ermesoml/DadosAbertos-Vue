@@ -83,11 +83,7 @@
         })
       },
       buscarDespesasURL: function (url) {
-<<<<<<< HEAD
         this.$http.get(url).then((response) => {
-=======
-        this.$http.get(url + '&ordenarPor=mes').then((response) => {
->>>>>>> 1f22cd9f6ea4d507385b83708e2981a3b337cf58
           this.despesas = this.despesas.concat(response.data.dados)
           for (let i = 0; i < response.data.links.length; i++) {
             if (response.data.links[i].rel === 'next') {
