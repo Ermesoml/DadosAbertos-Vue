@@ -68,6 +68,7 @@
     data () {
       return {
         api: 'https://dadosabertos.camara.leg.br/api/v2/deputados/',
+        apiJarbas: 'https://jarbas.serenata.ai/api/chamber_of_deputies/reimbursement/',
         deputado: {},
         despesas: [],
         despesas_filtradas: [],
@@ -84,6 +85,10 @@
           tipoDespesa: {
             key: 'tipoDespesa',
             label: 'Tipo de despesa'
+          },
+          idDocumento: {
+            key: 'idDocumento',
+            label: 'ID da despesa'
           },
           valorLiquido: {
             key: 'valorLiquido',
@@ -204,25 +209,35 @@
         this.despesas = []
         this.despesas_filtradas = []
         this.$http.get('https://dadosabertos.camara.leg.br/api/v2/deputados/' + this.$route.params.id + '/despesas' + '?ano=' + this.ano_pesquisa + '&itens=100&ordem=desc&ordenarPor=mes').then((response) => {
+          let temProximo = false
           this.despesas = response.data.dados
           this.despesas_filtradas = response.data.dados
           this.linhasTotais = this.despesas.length
           for (let i = 0; i < response.data.links.length; i++) {
             if (response.data.links[i].rel === 'next') {
               this.buscarDespesasURL(response.data.links[i].href)
+              temProximo = true
             }
+          }
+          if (!temProximo) {
+            this.buscarIntegracaoJarbas()
           }
         })
       },
       buscarDespesasURL: function (url) {
         this.$http.get(url).then((response) => {
+          let temProximo = false
           this.despesas = this.despesas.concat(response.data.dados)
           this.despesas_filtradas = this.despesas_filtradas.concat(response.data.dados)
           this.linhasTotais = this.despesas.length
           for (let i = 0; i < response.data.links.length; i++) {
             if (response.data.links[i].rel === 'next') {
               this.buscarDespesasURL(response.data.links[i].href)
+              temProximo = true
             }
+          }
+          if (!temProximo) {
+            this.buscarIntegracaoJarbas()
           }
         })
       },
@@ -246,6 +261,15 @@
             if (response.data.links[i].rel === 'next') {
               this.buscarProposicoesURL(response.data.links[i].href)
             }
+          }
+        })
+      },
+      buscarIntegracaoJarbas: function () {
+        this.despesas.forEach(despesa => {
+          if (despesa.idDocumento > 0) {
+            this.$http.get(this.apiJarbas + despesa.idDocumento).then((response) => {
+              despesa.suspeito = response.suspicions
+            })
           }
         })
       },
